@@ -176,6 +176,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install biome
+        run: npm install -D @biomejs/cli-linux-x64
+
       - name: Upload node_modules as an artifact
         uses: actions/upload-artifact@v4
         with:

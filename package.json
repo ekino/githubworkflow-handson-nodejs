@@ -29,10 +29,10 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/express": "5.0.0",
-    "@vitest/coverage-v8": "2.1.8",
+    "@vitest/coverage-v8": "^3.1.1",
     "nock": "13.5.6",
-    "tsx": "4.19.2",
+    "tsx": "^4.19.3",
     "typescript": "5.7.2",
-    "vitest": "2.1.8"
+    "vitest": "^3.1.1"
   }
 }
