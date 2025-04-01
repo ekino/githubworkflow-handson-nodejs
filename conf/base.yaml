@@ -1,0 +1,5 @@
+Logger:
+  level: info
+  namespaces: '*'
+  output: pretty # pretty, json
+Port: 3030
