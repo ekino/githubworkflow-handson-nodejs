@@ -52,5 +52,3 @@ node_modules
 !.yarn/versions
 .pnp.*
 tsconfig.lib.tsbuildinfo
-
-GITLAB.md

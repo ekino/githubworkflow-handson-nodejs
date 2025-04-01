@@ -7,6 +7,9 @@ Welcome to the GitHub Actions kata Ekino!
 
 GitHub Actions is a CI/CD platform that allows you to automate your build, test, and deployment pipeline directly from your GitHub repository. It uses workflows defined in `.github/workflows` directory to execute jobs triggered by events like pushes, pull requests, or scheduled tasks.
 
+**Objective**:  
+This kata is designed to introduce you to the concept of GitHub Actions, how to create CI/CD pipelines, and the benefits of automation in the development process. By completing each exercise, you'll learn how to configure and customize jobs, steps, and workflows in GitHub Actions.
+
 ## Prepare
 
 - Clone the repository
@@ -36,271 +39,198 @@ npm install
 git commit --allow-empty -m "Init kata john"
 ```
 
-## Create Your First GitHub Actions Workflow
+## Part 1
+
+### Job 1: Linting
+
+**Exercise**:  
+Create a job called `lint` that checks the code for linting errors. The job should run on an Ubuntu environment and execute the linting tool Biome.
+
+**Tasks**:
+
+1. Checkout the repository code.
+2. Set up Node.js with version 22.
+3. Install the required dependencies using `npm`.
+4. Run the linting command (`npm run lint`).
 
 <details>
 <summary>Expand</summary>
 
-1. Create a `.github/workflows` directory in the root of your project if it doesn't exist:
-
-```sh
-mkdir -p .github/workflows
-```
-
-2. Create a new workflow file, for example `ci.yml`:
-
-```sh
-touch .github/workflows/ci.yml
-```
-
-3. Modify the `ci.yml` file:
+**Solution**:
 
 ```yaml
-name: CI Pipeline
+lint:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-on:
-  push:
-    branches:
-      - john #replace by your branch name
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: "npm"
 
-jobs:
-  install:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Install dependencies
+      run: npm install
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install biome
-        run: npm install -D @biomejs/cli-linux-x64
+    - name: Run lint
+      run: npm run lint
 ```
 
-4. Commit and push your workflow file:
+**Explanation:**
 
-```sh
-git add .github/workflows/ci.yml
-git commit -m "Add GitHub Actions workflow"
-git push origin john
-```
+- `runs-on`: ubuntu-latest: This specifies that the job will run on the latest Ubuntu environment.
+- `actions/checkout@v4`: This step checks out the repository's code.
+- `biomejs/setup-biome@v2`: This sets up the Biome CLI tool to run linting.
+- `biome ci`: This runs the Biome CLI with the ci command to check for linting issues.
 
-Once you push your changes, GitHub will automatically trigger the workflow.
+#### What you’ve learned:
 
-5. Open your GitHub repository in a browser and navigate to the **Actions** tab to see your workflow running 🚀.
+**Skills acquired:**
 
-### 🔍 Explanation
+- 📦 **Basic GitHub Actions usage**: You used `actions/checkout@v4` to fetch the repository code, and `actions/setup-node@v4` to configure the Node.js environment.
+- 🧹 **Code quality checks**: You integrated a linter (Biome) to automatically detect style issues, bugs, and inconsistencies in the codebase.
+- ⚡️ **Workflow optimization**: By using the npm cache with `cache: "npm"`, you’ve seen how caching can significantly reduce CI execution time.
 
-- `name:` Sets the name of the GitHub Actions workflow.
+**Why it matters:**
 
-- `on:` Defines when the pipeline should run:
-
-  - On each push to the main branch.
-
-- `jobs:` Defines the list of jobs to run.
-
-- `install:`
-
-- `runs-on:`
-
-  - `ubuntu-latest:` Specifies that the job will run on an Ubuntu environment.
-
-  - `steps:` Lists the steps of the job:
-
-        1. Checkout repository – Clones the repository.
-
-        2. Setup Node.js – Uses the latest Node.js 22 version.
-
-        3. Install dependencies – Runs npm ci to install dependencies.
-
-        4. Install biome – Installs @biomejs/cli-linux-x64 to avoid issues in GitHub Actions.
+Linting enforces clean, consistent code formatting and helps prevent common issues early. Automating this step ensures that every contributor follows the same coding standards, reducing noise during code reviews.
 
 </details>
 
-## 🚀 Using Artifacts and Cache in GitHub Actions
+### Job 2: Type Checking
 
-In GitHub Actions, artifacts and cache serve similar purposes as in GitLab CI:
+**Exercise**:  
+Create a job called `verify-typescript-types` that checks for TypeScript type errors in the codebase. The job should:
 
-- **Artifacts** are files generated during a job that you want to persist and share between stages (e.g., build outputs, test reports).
-- **Cache** helps store dependencies or frequently used files to speed up workflow runs.
-
-🔗 Refer to the [GitHub Actions documentation](https://docs.github.com/en/actions/using-workflows/caching-dependencies-and-builds) on caching and artifacts for more details.
-
-### 🏋️ Exercise
-
-1. Enhance the `install` job to include artifacts and cache configurations:
-
-   - **Artifacts**: Save `node_modules/` as an artifact and set an expiration time of 2 weeks.
-   - **Cache**: Use a cache key based on `package-lock.json` and enable pull-push behavior to reuse dependencies across jobs.
-
-2. Commit your updated workflow
-   - Push your changes to trigger the GitHub Actions workflow.
-
-### 🎯 Correction
+1. Checkout the repository code.
+2. Set up Node.js with version 22.
+3. Install the required dependencies using `npm`.
+4. Run the TypeScript type checking command (`npm run typing-check`).
 
 <details>
 <summary>Expand</summary>
 
+**Solution**:
+
 ```yaml
-name: CI Pipeline
+verify-typescript-types:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-on:
-  push:
-    branches:
-      - john
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: "npm"
 
-jobs:
-  install:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Install dependencies
+      run: npm install
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
-          restore-keys: node-modules-
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Upload node_modules as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-modules
-          path: node_modules
-          retention-days: 14
+    - name: Verify typescript types
+      run: npm run typing-check
 ```
 
-### 🔍 Explanation
+**Explanation:**
 
-#### `actions/cache`:
+- `actions/setup-node@v4`: This action sets up the Node.js environment, including caching npm dependencies to speed up future runs.
 
-- Caches `node_modules/` based on `package-lock.json`.
-- If `package-lock.json` changes, a new cache is created.
-- Uses `restore-keys` for fallback cache retrieval.
+- `npm install`: This installs the project's dependencies.
 
-#### `actions/upload-artifact`:
+- `npm run typing-check`: This runs the type-checking script to ensure there are no TypeScript errors in the code.
 
-- Saves `node_modules/` as an artifact.
-- The artifact remains available for 2 weeks (14 days).
+#### What you’ve learned:
 
-💡 This setup ensures faster builds by caching dependencies and preserving files across jobs! 🚀
+**Skills acquired:**
+
+- 👓 **Static analysis**: By running `npm run typing-check`, you executed a static TypeScript check to catch potential issues without running the code.
+- 🔄 **Reusing workflow patterns**: This job follows the same structure as the linting one, showing how consistent, reusable workflow design makes pipelines easier to manage.
+- 📘 **Separation of concerns**: Each job is focused on a single responsibility, improving clarity and maintainability of the CI configuration.
+
+**Why it matters:**
+
+Strong type checking helps catch bugs before runtime, increasing confidence in your codebase. Automating this guarantees type safety throughout the development lifecycle.
 
 </details>
 
-## 🚀 Adding a Lint Job in GitHub Actions
+### Job 3: Test Coverage
 
-Linting helps detect potential errors, enforce coding standards, and maintain code quality.  
-By adding a **lint job** in the pipeline, we ensure that all code adheres to best practices before merging changes.
+**Exercise**:  
+Create a job called `code-coverage` that runs the tests with coverage and reports the coverage results. The job should:
 
-🔗 Refer to the [GitHub Actions documentation](https://docs.github.com/en/actions/using-jobs/defining-job-dependencies) to learn more about job dependencies.
-
-### 📝 Exercise
-
-Enhance the workflow by:
-
-1. Creating a new stage called **check**.
-2. Adding a **lint job** that runs `npm run lint`.
-3. Reusing `node_modules/` from the **install** job using GitHub Actions cache & artifacts.
-4. Making **lint** depend on **install**, ensuring dependencies are installed first.
-5. Commit your updated workflow
-   - Push your changes to trigger the GitHub Actions workflow.
-   - Verify that the **lint job** runs successfully in the **Actions** tab. 🚀
-
-### 🎯 Correction
+1. Checkout the repository code.
+2. Set up Node.js with version 22.
+3. Install the required dependencies using `npm`.
+4. Run tests and generate coverage reports (`npm run coverage`).
+5. Report the coverage results using a coverage report action.
 
 <details>
 <summary>Expand</summary>
 
+**Solution**:
+
 ```yaml
-name: CI Pipeline
+code-coverage:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-on:
-  push:
-    branches:
-      - john
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: "npm"
 
-jobs:
-  install:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Install dependencies
+      run: npm install
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+    - name: Run code coverage
+      run: npm run coverage
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-${{ hashFiles('package-lock.json') }}
-          restore-keys: node-modules-
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Upload node_modules as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-modules
-          path: node_modules
-          retention-days: 1
-
-  lint:
-    runs-on: ubuntu-latest
-    needs: install # Ensures the install job completes first
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download node_modules artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: node-modules
-          path: node_modules
-
-      - name: Run linter
-        run: npm run lint
+    - name: Report Coverage
+      if: always()
+      uses: davelosert/vitest-coverage-report-action@v2
 ```
 
-### 🔍 Explanation
+**Explanation:**
 
-### **install job**:
+- `actions/setup-node@v4`: This action sets up the Node.js environment, including caching npm dependencies to speed up future runs.
 
-- Installs dependencies using `npm ci`.
-- Caches `node_modules/` using `actions/cache` for efficiency.
-- Uploads `node_modules/` as an artifact to be used in later jobs.
+- `npm install`: This installs the project's dependencies.
 
-### **lint job**:
+- `npm run coverage`: This command runs the tests and generates coverage reports.
 
-- Declares `needs: install`, ensuring that dependencies are installed first.
-- Downloads `node_modules/` from the artifact saved in the **install** job.
-- Runs `npm run lint` to check code quality.
+- `davelosert/vitest-coverage-report-action@v2`: This action is used to report the coverage results. The if: always() ensures that the coverage report is generated regardless of whether the tests pass or fail.
 
-### 💡 Why use both **cache** and **artifacts**?
+#### What you've learned:
 
-- **Cache (`actions/cache`)** is shared between workflow runs (persists across multiple commits).
-- **Artifacts (`actions/upload-artifact`)** are job-specific (persist only within the same workflow execution).
+**Skills acquired:**
 
-Using both ensures that dependencies are efficiently reused across jobs and across multiple workflow runs.
+- ✅ **Running tests in CI**: You configured GitHub Actions to automatically execute the test suite using `npm run coverage`.
+- 📊 **Generating and reporting code coverage**: You used the third-party action `davelosert/vitest-coverage-report-action@v2` to visualize coverage results.
+- 🧩 **Using external actions**: You explored how to integrate community actions to enhance CI/CD capabilities.
 
-🚀 **This setup ensures faster builds and enforces linting rules before merging any code!**
+**Why it matters:**
+
+Test coverage highlights which parts of the code are tested and which aren't, helping teams identify gaps and prioritize test writing. Reporting this coverage ensures visibility and encourages better test practices.
 
 </details>
-Happy automating!
+
+### Conclusion:
+
+<details>
+<summary>Expand</summary>
+
+With these three jobs, you’ve built a basic **quality pipeline** for any Node.js project:
+
+- **Linting** ensures a clean codebase.
+- **Typing** ensures static correctness.
+- **Testing & Coverage** ensure reliability and confidence.
+
+You now know how to set up **automated checks on every push or pull request**, forming the foundation of a **collaborative development workflow**.
+
+</details>

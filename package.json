@@ -17,9 +17,8 @@
     "build": "tsc -p tsconfig.build.json",
     "typing-check": "tsc -p tsconfig.build.json --noEmit",
     "lint": "biome check --write",
-    "check": "biome check",
     "test": "vitest --run tests/unit/**",
-    "coverage": "vitest run tests/unit/** --coverage"
+    "coverage": "vitest run tests/unit/** --coverage.enabled --coverage.provider=v8 --coverage.reporter=json-summary --coverage.reporter=json"
   },
   "dependencies": {
     "@ekino/config": "0.6.3",
@@ -29,10 +28,10 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/express": "5.0.0",
-    "@vitest/coverage-v8": "2.1.8",
+    "@vitest/coverage-v8": "3.1.1",
     "nock": "13.5.6",
-    "tsx": "4.19.2",
+    "tsx": "4.19.3",
     "typescript": "5.7.2",
-    "vitest": "2.1.8"
+    "vitest": "3.1.1"
   }
 }
