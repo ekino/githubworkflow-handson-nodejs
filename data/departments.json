@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "name": "Creative Services"
+    },
+    {
+        "id": 2,
+        "name": "Product Development"
+    },
+    {
+        "id": 3,
+        "name": "Marketing"
+    },
+    {
+        "id": 4,
+        "name": "Strategic Planning"
+    },
+    {
+        "id": 5,
+        "name": "Accounting"
+    },
+    {
+        "id": 6,
+        "name": "Human Resources"
+    },
+    {
+        "id": 7,
+        "name": "Quality Analysis"
+    }
+]
