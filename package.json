@@ -1,0 +1,37 @@
+{
+  "name": "github-kata",
+  "description": "Github Kata hands-on",
+  "version": "1.0.0",
+  "keywords": [
+    "github",
+    "kata",
+    "hands-on"
+  ],
+  "author": "mbouchez",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch app/server.ts",
+    "start": "node build/server.js",
+    "build": "tsc -p tsconfig.build.json",
+    "typing-check": "tsc -p tsconfig.build.json --noEmit",
+    "lint": "biome check --write",
+    "test": "vitest --run tests/unit/**",
+    "coverage": "vitest run tests/unit/** --coverage.enabled --coverage.provider=v8 --coverage.reporter=json-summary --coverage.reporter=json"
+  },
+  "dependencies": {
+    "@ekino/config": "0.6.3",
+    "@ekino/logger": "2.1.1",
+    "express": "5.0.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/express": "5.0.0",
+    "@vitest/coverage-v8": "3.1.1",
+    "nock": "13.5.6",
+    "tsx": "4.19.3",
+    "typescript": "5.7.2",
+    "vitest": "3.1.1"
+  }
+}
