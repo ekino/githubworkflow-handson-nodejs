@@ -220,17 +220,133 @@ Test coverage highlights which parts of the code are tested and which aren't, he
 
 </details>
 
+### Job 4: Docker Build and Push
+
+**Exercise**:  
+Create a job called `build-and-push` that builds a Docker image from the Dockerfile and pushes it to GitHub Container Registry (GHCR). The job should:
+
+1. Only run when the previous jobs (lint, verify-typescript-types, code-coverage) have completed successfully
+2. Checkout the repository code
+3. Set up Docker Buildx for multi-platform builds
+4. Log in to GitHub Container Registry using GitHub secrets
+5. Extract metadata from Git for proper image tagging
+6. Build and push the Docker image with appropriate tags
+
+<details>
+<summary>Expand</summary>
+
+**Solution**:
+
+```yaml
+build-and-push:
+  needs: [lint, verify-typescript-types, code-coverage]
+  runs-on: ubuntu-latest
+  permissions:
+    contents: read
+    packages: write
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        tags: |
+          type=ref,event=branch
+          type=sha,format=short
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        platforms: linux/amd64,linux/arm64
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+```
+
+**Explanation:**
+
+- `needs: [lint, verify-typescript-types, code-coverage]`: This ensures the job only runs after the previous jobs have completed successfully, creating a pipeline.
+
+- `permissions`: Explicitly sets the required permissions for the GITHUB_TOKEN to read repository contents and write to the GitHub Packages registry.
+
+- `docker/setup-buildx-action@v3`: Sets up Docker Buildx, which provides enhanced build capabilities including better caching and multi-platform builds.
+
+- `docker/login-action@v3`: Authenticates with GitHub Container Registry using the automatically provided GITHUB_TOKEN.
+
+- `docker/metadata-action@v5`: Extracts metadata from Git to create appropriate tags and labels for the Docker image:
+
+  - `type=ref,event=branch`: Tags the image with the branch name (e.g., `main`)
+  - `type=sha,format=short`: Tags the image with the short Git commit SHA for easier identification
+
+- `docker/build-push-action@v5`: Builds and pushes the Docker image with:
+  - Multi-platform support for both AMD64 (standard x86 processors) and ARM64 (like Apple Silicon)
+  - GitHub Actions cache integration for faster builds
+  - Tags and labels from the metadata action
+  - Automatic push to the registry
+
+#### What you've learned:
+
+**Skills acquired:**
+
+- 🔄 **CI/CD Pipeline Construction**: You've created a complete pipeline from code quality checks to deployment, learning how jobs can depend on each other with the `needs` keyword.
+- 🐳 **Docker Integration**: You've learned how to build and push multi-architecture Docker images (AMD64 and ARM64) as part of your CI/CD pipeline.
+- 🔑 **Secure Authentication**: You've used GitHub's built-in token system to securely authenticate with the container registry without exposing credentials.
+- 🏷️ **Image Tagging Strategies**: You've implemented best practices for versioning container images using Git metadata.
+- 🚀 **Deployment Automation**: You've automated the deployment process, ensuring that only code that passes quality checks gets deployed.
+
+**Why it matters:**
+
+Containerization is a critical part of modern application deployment. By automating the build and push process, you ensure consistent, reproducible deployments and eliminate manual steps that could introduce errors. This completes the CI/CD pipeline, taking your code from commit to deployable artifact.
+
+**Using your container image:**
+
+Once pushed, your image will be available at `ghcr.io/ekino/githubworkflow-handson-nodejs` with two tags:
+
+- Branch name tag: `ghcr.io/ekino/githubworkflow-handson-nodejs:main` (or your branch name)
+- Short SHA tag: `ghcr.io/ekino/githubworkflow-handson-nodejs:a1b2c3d` (abbreviated commit hash)
+
+You can pull either version:
+
+```bash
+# Pull by branch name
+docker pull ghcr.io/ekino/githubworkflow-handson-nodejs:main
+
+# Pull by specific commit
+docker pull ghcr.io/ekino/githubworkflow-handson-nodejs:a1b2c3d
+```
+
+The multi-architecture support means the same image works on both Intel/AMD machines and ARM-based systems like Apple Silicon Macs.
+
+</details>
+
 ### Conclusion:
 
 <details>
 <summary>Expand</summary>
 
-With these three jobs, you’ve built a basic **quality pipeline** for any Node.js project:
+With these four jobs, you've built a complete **CI/CD pipeline** for any Node.js project:
 
 - **Linting** ensures a clean codebase.
 - **Typing** ensures static correctness.
 - **Testing & Coverage** ensure reliability and confidence.
+- **Docker Build & Push** automates deployment and ensures only quality code is deployed.
 
-You now know how to set up **automated checks on every push or pull request**, forming the foundation of a **collaborative development workflow**.
+You now know how to set up **automated checks on every push or pull request**, forming the foundation of a **collaborative development workflow** that extends all the way to deployment.
 
 </details>
