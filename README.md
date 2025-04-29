@@ -72,7 +72,7 @@ lint:
         cache: "npm"
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Run lint
       run: npm run lint
@@ -128,7 +128,7 @@ verify-typescript-types:
         cache: "npm"
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Verify typescript types
       run: npm run typing-check
@@ -138,7 +138,7 @@ verify-typescript-types:
 
 - `actions/setup-node@v4`: This action sets up the Node.js environment, including caching npm dependencies to speed up future runs.
 
-- `npm install`: This installs the project's dependencies.
+- `npm ci`: This installs the project's dependencies from the package-lock.
 
 - `npm run typing-check`: This runs the type-checking script to ensure there are no TypeScript errors in the code.
 
@@ -186,7 +186,7 @@ code-coverage:
         cache: "npm"
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Run code coverage
       run: npm run coverage
@@ -200,7 +200,7 @@ code-coverage:
 
 - `actions/setup-node@v4`: This action sets up the Node.js environment, including caching npm dependencies to speed up future runs.
 
-- `npm install`: This installs the project's dependencies.
+- `npm ci`: This installs the project's dependencies from the package-lock.
 
 - `npm run coverage`: This command runs the tests and generates coverage reports.
 
