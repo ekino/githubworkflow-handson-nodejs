@@ -24,7 +24,6 @@ cd githubworkflow-handson-nodejs
 
 ```sh
 git checkout -b john
-# git switch -c john
 ```
 
 - Install the project dependencies
@@ -37,6 +36,17 @@ npm install
 
 ```sh
 git commit --allow-empty -m "Init kata john"
+```
+
+- Create a folder `.github/workflows`.
+- Add `ci.yml` inside.
+- To make your workflow work, you need to add a trigger to your YML file. Several triggers are documented [in the official documentation](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on). For the purpose of the katas, we will use a trigger that activates only on your branch.
+
+```sh
+on:
+  push:
+    branches:
+      - examples
 ```
 
 ## Part 1
